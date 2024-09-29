@@ -1,18 +1,13 @@
 <template>
   <div id="app">
+    <Hero />
     <PokemonList />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import PokemonList from './views/PokemonList.vue';
-
-export default defineComponent({
-  components: {
-    PokemonList,
-  },
-});
+import Hero from './components/Hero.vue';
 </script>
 
 <style>
