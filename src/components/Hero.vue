@@ -6,24 +6,23 @@
     </section>
 </template>
 
-
-<script setup ="ts">
+<script setup lang="ts">
 </script>
 
 <style scoped>
 .hero {
-    text-align: center;
+    background-color: black;
     padding: 50px 0;
+    text-align: center;
+}
+
+.hero-logo {
+    width: 150px;
+}
+
+.hero-title {
     color: white;
-}
-
-.logo {
-    width: 800px;
-    height: auto;
-    margin-bottom: 20px;
-}
-
-h1 {
     font-size: 3rem;
+    margin-top: 20px;
 }
 </style>
