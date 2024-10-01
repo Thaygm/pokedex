@@ -4,7 +4,7 @@
     <div class="search-filters">
       <input
         v-model="searchTerm"
-        placeholder="Buscar por nome ou número o Pokemon"
+        placeholder="Buscar por nome ou número o Pokémon"
         class="custom-input"
       />
       <select v-model="selectedType" class="custom-select">
@@ -21,7 +21,7 @@
 
     <div class="pokemon-list">
       <PokemonCard
-        v-for="pokemon in filteredPokemonList"
+        v-for="pokemon in paginatedPokemonList"
         :key="pokemon.id"
         :pokemonName="pokemon.name"
         :pokemonId="pokemon.id"
@@ -29,6 +29,18 @@
         :height="pokemon.height"
         :weight="pokemon.weight"
       />
+    </div>
+
+    <div class="pagination-controls">
+      <button @click="previousPage" :disabled="currentPage === 1" class="pagination-button previous-button">
+        <img src="../../assets/images/Pikachu_rtn.png" alt="Pikachu" class="hover-image" />
+        Anterior
+      </button>
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-button next-button">
+        Próximo
+        <img src="../../assets/images/Pikachu_nxt.png" alt="Pikachu" class="hover-image" />
+      </button>
     </div>
   </div>
 </template>
@@ -71,6 +83,9 @@ onMounted(() => {
   fetchPokemonList();
 });
 
+const currentPage = ref(1);
+const itemsPerPage = 15;
+
 const filteredPokemonList = computed(() => {
   return pokemonList.value.filter(pokemon => {
     const matchesSearchTerm = pokemon.name.includes(searchTerm.value.toLowerCase()) || String(pokemon.id).includes(searchTerm.value);
@@ -78,6 +93,27 @@ const filteredPokemonList = computed(() => {
     return matchesSearchTerm && matchesType;
   });
 });
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredPokemonList.value.length / itemsPerPage);
+});
+
+const paginatedPokemonList = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredPokemonList.value.slice(start, start + itemsPerPage);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
 
 const traduzirTipo = (tipo: string) => {
   const traducoes: { [key: string]: string } = {
@@ -149,8 +185,49 @@ const traduzirTipo = (tipo: string) => {
 
 .pokemon-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
   padding: 20px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  padding: 10px 20px;
+  background-color: #ffffff;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.pagination-button:hover {
+  background-color: #f0f0f0;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hover-image {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.pagination-button:hover .hover-image {
+  opacity: 1;
 }
 </style>

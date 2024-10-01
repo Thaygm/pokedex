@@ -30,16 +30,25 @@
               <div class="stat-name" :style="{ color: getStatColor(stat.stat.name) }">
                 {{ traduzirEstatistica(stat.stat.name) }}
               </div>
-              <div class="stat-bar" :title="stat.base_stat">
-                <div
-                  class="stat-bar-filled"
-                  :style="{ width: (stat.base_stat / 255) * 100 + '%', backgroundColor: getStatColor(stat.stat.name) }"
-                ></div>
+              <div class="stat-bar">
                 <div
                   class="stat-bar-empty"
                   :style="{ width: (100 - (stat.base_stat / 255) * 100) + '%', backgroundColor: getStatColor(stat.stat.name), opacity: 0.3 }"
                 ></div>
+                <div
+                  class="stat-bar-filled"
+                  :style="{ width: (stat.base_stat / 255) * 100 + '%', backgroundColor: getStatColor(stat.stat.name) }"
+                ></div>
               </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="pokemon-evolution">
+          <h2>Cadeia de Evolução</h2>
+          <ul>
+            <li v-for="(evolution, index) in evolutionChain" :key="index">
+              <strong>{{ evolution.name }} (#{{ evolution.id }})</strong>
             </li>
           </ul>
         </div>
@@ -72,7 +81,13 @@ interface Pokemon {
   }>;
 }
 
+interface Evolution {
+  id: number;
+  name: string;
+}
+
 const pokemon = ref<Pokemon | null>(null);
+const evolutionChain = ref<Evolution[]>([]);
 const route = useRoute();
 const router = useRouter();
 
@@ -81,8 +96,31 @@ const fetchPokemonDetails = async () => {
   try {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
     pokemon.value = response.data;
+    await fetchEvolutionChain(pokemon.value.species.url);
   } catch (error) {
     console.error("Erro ao buscar Pokémon:", error);
+  }
+};
+
+const fetchEvolutionChain = async (speciesUrl: string) => {
+  try {
+    const response = await axios.get(speciesUrl);
+    const evolutionResponse = await axios.get(response.data.evolution_chain.url);
+    const evolutions = evolutionResponse.data.chain;
+
+    const fetchEvolutions = (chain: any): Evolution[] => {
+      const evolutions: Evolution[] = [{ id: chain.species.url.split('/').slice(-2, -1)[0], name: chain.species.name }];
+      if (chain.evolves_to.length > 0) {
+        chain.evolves_to.forEach((evo: any) => {
+          evolutions.push(...fetchEvolutions(evo));
+        });
+      }
+      return evolutions;
+    };
+
+    evolutionChain.value = fetchEvolutions(evolutions);
+  } catch (error) {
+    console.error("Erro ao buscar a cadeia de evolução:", error);
   }
 };
 
@@ -203,7 +241,7 @@ onMounted(fetchPokemonDetails);
 }
 
 .back-button:hover {
-  transform: scale(1.1); 
+  transform: scale(1.1);
 }
 
 .pokemon-container {
@@ -249,7 +287,7 @@ onMounted(fetchPokemonDetails);
   display: inline-block;
   margin: 5px;
   padding: 5px 10px;
-  border-radius: 12px;
+  border-radius: 20px;
   color: #fff;
 }
 
@@ -258,32 +296,42 @@ onMounted(fetchPokemonDetails);
 }
 
 .stat-item {
-  margin: 10px 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin: 5px 0;
 }
 
 .stat-name {
-  width: 150px;
+  width: 40%;
 }
 
 .stat-bar {
-  width: 300px;
-  height: 15px;
-  border-radius: 10px;
-  flex-grow: 1;
-  margin-left: 10px;
-  background-color: transparent;
   position: relative;
-}
-
-.stat-bar-filled {
-  height: 100%;
+  width: 60%;
+  height: 20px;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .stat-bar-empty {
+  position: absolute;
   height: 100%;
   border-radius: 10px;
+}
+
+.stat-bar-filled {
+  position: absolute;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.stat-value {
+  width: 20%;
+  text-align: right;
+}
+
+.pokemon-evolution {
+  margin-top: 20px;
 }
 </style>

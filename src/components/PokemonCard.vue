@@ -2,8 +2,8 @@
   <div class="pokemon-card" @click="detailsPokemon">
     <img :src="pokemonImage" :alt="pokemonName" class="pokemon-image" />
     <h3>{{ pokemonName }} (#{{ pokemonId }})</h3>
-    <p>Altura: {{ height / 10 }} m</p>
-    <p>Peso: {{ weight / 10 }} kg</p>
+    <p class="pokemon-height">Altura: {{ height / 10 }} m</p>
+    <p class="pokemon-weight">Peso: {{ weight / 10 }} kg</p>
   </div>
 </template>
 
@@ -29,20 +29,33 @@ const detailsPokemon = () => {
 <style scoped>
 .pokemon-card {
   border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 20px;
   text-align: center;
-  background-color: #f9f9f9;
+  background: linear-gradient(180deg, #FEFF9F, #BBE9FF);
   transition: box-shadow 0.3s;
   cursor: pointer;
+  width: 300px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .pokemon-card:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .pokemon-image {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
+}
+
+.pokemon-height,
+.pokemon-weight {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 5px 0;
 }
 </style>
