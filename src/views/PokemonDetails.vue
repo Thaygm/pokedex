@@ -8,13 +8,14 @@
         <h1 class="pokemon-name">{{ pokemon.name }} (#{{ pokemon.id }})</h1>
 
         <div class="pokemon-types">
+          <h2>Tipos</h2>
           <span
             v-for="type in pokemon.types"
             :key="type.type.name"
             :style="{ backgroundColor: getTypeColor(type.type.name) }"
             class="pokemon-type"
           >
-            {{ traduzirTipo(type.type.name) }}
+            {{ traduzirTipo(type.type.name) }} (#{{ pokemon.id }})
           </span>
         </div>
 
@@ -22,7 +23,9 @@
           <h2>Estatísticas</h2>
           <ul>
             <li v-for="stat in pokemon.stats" :key="stat.stat.name" class="stat-item">
-              <div class="stat-name">{{ traduzirEstatistica(stat.stat.name) }}</div>
+              <div class="stat-name" :style="{ color: getStatColor(stat.stat.name) }">
+                {{ traduzirEstatistica(stat.stat.name) }}
+              </div>
               <div class="stat-bar" :title="stat.base_stat">
                 <div
                   class="stat-bar-filled"
@@ -32,7 +35,6 @@
                   class="stat-bar-empty"
                   :style="{ width: (100 - (stat.base_stat / 255) * 100) + '%', backgroundColor: getStatColor(stat.stat.name), opacity: 0.3 }"
                 ></div>
-
               </div>
             </li>
           </ul>
@@ -139,12 +141,12 @@ const traduzirEstatistica = (estatistica: string) => {
 
 const getStatColor = (statName: string) => {
   const statColors: { [key: string]: string } = {
-    hp: '#4F75FF',
-    attack: '#A02334',
+    hp: '#87A2FF',
+    attack: '#C7253E',
     defense: '#97FEED',
-    'special-attack': '#AD49E1',
+    'special-attack': '#CDC1FF',
     'special-defense': '#FFEB55',
-    speed: '#E85C0D',
+    speed: '#FF8343',
   };
   return statColors[statName] || '#FFFFFF';
 };
@@ -158,13 +160,17 @@ onMounted(fetchPokemonDetails);
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: linear-gradient(180deg, #FFCD0D, #3C68B0);
   overflow: hidden;
 }
 
 .pokemon-container {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .pokemon-image-container {
@@ -177,7 +183,7 @@ onMounted(fetchPokemonDetails);
 
 .pokemon-image {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 800px;
   height: 800px;
 }
 
@@ -243,20 +249,21 @@ onMounted(fetchPokemonDetails);
   left: 0;
 }
 
-.stat-value {
+.stat-bar:after {
+  content: attr(title);
   position: absolute;
   right: 0;
-  top: -20px;
+  bottom: 20px;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
-  padding: 2px 5px; 
+  padding: 2px 5px;
   border-radius: 5px;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.stat-bar:hover .stat-value {
+.stat-bar:hover:after {
   opacity: 1;
 }
 </style>
