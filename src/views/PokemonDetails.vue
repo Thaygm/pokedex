@@ -1,5 +1,9 @@
 <template>
   <div v-if="pokemon" class="pokemon-details">
+    <button @click="goHome" class="back-button">
+      Voltar
+      <img src="../assets/images/Pikachu_rtn.png" alt="Pikachu" class="hover-image" />
+    </button>
     <div class="pokemon-container">
       <div class="pokemon-image-container">
         <img :src="pokemon.sprites.front_default" :alt="pokemon.name" class="pokemon-image" />
@@ -15,7 +19,7 @@
             :style="{ backgroundColor: getTypeColor(type.type.name) }"
             class="pokemon-type"
           >
-            {{ traduzirTipo(type.type.name) }} (#{{ pokemon.id }})
+            {{ traduzirTipo(type.type.name) }}
           </span>
         </div>
 
@@ -47,7 +51,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 interface Pokemon {
   id: number;
@@ -70,6 +74,7 @@ interface Pokemon {
 
 const pokemon = ref<Pokemon | null>(null);
 const route = useRoute();
+const router = useRouter();
 
 const fetchPokemonDetails = async () => {
   const pokemonId = route.params.id;
@@ -151,6 +156,10 @@ const getStatColor = (statName: string) => {
   return statColors[statName] || '#FFFFFF';
 };
 
+const goHome = () => {
+  router.push({ name: 'Home' });
+};
+
 onMounted(fetchPokemonDetails);
 </script>
 
@@ -162,6 +171,39 @@ onMounted(fetchPokemonDetails);
   height: 100vh;
   background: linear-gradient(180deg, #FFCD0D, #3C68B0);
   overflow: hidden;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.hover-image {
+  opacity: 0;
+  width: 30px;
+  height: auto;
+  margin-left: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.back-button:hover .hover-image {
+  opacity: 1;
+}
+
+.back-button:hover {
+  transform: scale(1.1); 
 }
 
 .pokemon-container {
@@ -238,32 +280,10 @@ onMounted(fetchPokemonDetails);
 .stat-bar-filled {
   height: 100%;
   border-radius: 10px;
-  transition: width 0.3s ease;
 }
 
 .stat-bar-empty {
   height: 100%;
   border-radius: 10px;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.stat-bar:after {
-  content: attr(title);
-  position: absolute;
-  right: 0;
-  bottom: 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 2px 5px;
-  border-radius: 5px;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.stat-bar:hover:after {
-  opacity: 1;
 }
 </style>

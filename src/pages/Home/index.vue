@@ -2,13 +2,23 @@
   <div>
     <Hero />
     <div class="search-filters">
-      <input v-model="searchTerm" placeholder="Buscar Pokémon" />
-      <select v-model="selectedType">
+      <input
+        v-model="searchTerm"
+        placeholder="Buscar por nome ou número o Pokemon"
+        class="custom-input"
+      />
+      <select v-model="selectedType" class="custom-select">
         <option value="">Todos os tipos</option>
-        <option v-for="type in types" :key="type" :value="type">{{ traduzirTipo(type) }}</option>
+        <option
+          v-for="type in types"
+          :key="type"
+          :value="type"
+        >
+          {{ traduzirTipo(type) }}
+        </option>
       </select>
     </div>
-    
+
     <div class="pokemon-list">
       <PokemonCard
         v-for="pokemon in filteredPokemonList"
@@ -32,14 +42,18 @@ import axios from 'axios';
 const searchTerm = ref('');
 const selectedType = ref('');
 const pokemonList = ref<any[]>([]);
-const types = ['fire', 'water', 'grass', 'electric', 'rock', 'ground', 'flying', 'bug', 'poison', 'normal', 'ghost', 'fighting', 'ice', 'psychic', 'dragon', 'dark', 'fairy', 'steel'];
+const types = [
+  'fire', 'water', 'grass', 'electric', 'rock', 'ground',
+  'flying', 'bug', 'poison', 'normal', 'ghost', 'fighting',
+  'ice', 'psychic', 'dragon', 'dark', 'fairy', 'steel'
+];
 
 const fetchPokemonList = async () => {
   const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
   const pokemonDetails = await Promise.all(
     response.data.results.map(async (pokemon: any, index: number) => {
       const detailResponse = await axios.get(pokemon.url);
-      const { height, weight, sprites, types } = detailResponse.data; 
+      const { height, weight, sprites, types } = detailResponse.data;
       return {
         name: pokemon.name,
         id: index + 1,
@@ -64,6 +78,7 @@ const filteredPokemonList = computed(() => {
     return matchesSearchTerm && matchesType;
   });
 });
+
 const traduzirTipo = (tipo: string) => {
   const traducoes: { [key: string]: string } = {
     fire: 'Fogo',
@@ -96,11 +111,40 @@ const traduzirTipo = (tipo: string) => {
   margin: 20px 0;
 }
 
-.search-filters input,
-.search-filters select {
+.search-filters input {
   margin: 0 10px;
   padding: 10px;
   font-size: 1rem;
+  width: 350px;
+}
+
+.custom-input {
+  border: none;
+  border-bottom: 2px solid #050403;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  padding: 10px;
+  font-size: 1rem;
+  margin: 0 10px;
+  background-color: transparent;
+}
+
+.custom-input:focus {
+  border-bottom: 2px solid #3c68b0;
+  background-color: transparent;
+}
+
+.custom-select {
+  border: none;
+  border-bottom: 2px solid #050403;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  padding: 10px;
+  font-size: 1rem;
+  margin: 0 10px;
+  background-color: transparent;
 }
 
 .pokemon-list {
