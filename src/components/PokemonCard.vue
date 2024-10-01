@@ -1,5 +1,5 @@
 <template>
-  <div class="pokemon-card">
+  <div class="pokemon-card" @click="detailsPokemon">
     <img :src="pokemonImage" :alt="pokemonName" class="pokemon-image" />
     <h3>{{ pokemonName }} (#{{ pokemonId }})</h3>
     <p>Altura: {{ height / 10 }} m</p>
@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   pokemonName: string;
@@ -18,7 +19,11 @@ const props = defineProps<{
   weight: number;
 }>();
 
-const { pokemonName, pokemonId, pokemonImage, height, weight } = props;
+const router = useRouter();
+
+const detailsPokemon = () => {
+  router.push({ name: 'PokemonDetails', params: { id: props.pokemonId } });
+};
 </script>
 
 <style scoped>
@@ -29,6 +34,7 @@ const { pokemonName, pokemonId, pokemonImage, height, weight } = props;
   text-align: center;
   background-color: #f9f9f9;
   transition: box-shadow 0.3s;
+  cursor: pointer;
 }
 
 .pokemon-card:hover {
