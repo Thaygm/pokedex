@@ -1,6 +1,23 @@
 <template>
   <div>
     <Hero />
+    <div class="favorites">
+      <div class="favorites-header">
+        <h2>Favoritos</h2>
+        <button class="clear-favorites" @click="clearFavorites">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+      <div class="favorites-list">
+        <span v-if="favoritePokemons.length === 0">Nenhum favorito ainda.</span>
+        <ul>
+          <li v-for="pokemon in favoritePokemons" :key="pokemon.id">
+            {{ pokemon.name }} (#{{ pokemon.id }})
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <div class="search-filters">
       <input
         v-model="searchTerm"
@@ -28,6 +45,8 @@
         :pokemonImage="pokemon.image"
         :height="pokemon.height"
         :weight="pokemon.weight"
+        @toggle-favorite="toggleFavorite"
+        :is-favorite="isFavorite(pokemon.id)"
       />
     </div>
 
@@ -54,6 +73,8 @@ import axios from 'axios';
 const searchTerm = ref('');
 const selectedType = ref('');
 const pokemonList = ref<any[]>([]);
+const favoritePokemons = ref<any[]>([]);
+
 const types = [
   'fire', 'water', 'grass', 'electric', 'rock', 'ground',
   'flying', 'bug', 'poison', 'normal', 'ghost', 'fighting',
@@ -115,6 +136,23 @@ const previousPage = () => {
   }
 };
 
+const toggleFavorite = (pokemon) => {
+  const index = favoritePokemons.value.findIndex(fav => fav.id === pokemon.id);
+  if (index === -1) {
+    favoritePokemons.value.push(pokemon);
+  } else {
+    favoritePokemons.value.splice(index, 1);
+  }
+};
+
+const isFavorite = (id) => {
+  return favoritePokemons.value.some(fav => fav.id === id);
+};
+
+const clearFavorites = () => {
+  favoritePokemons.value = [];
+};
+
 const traduzirTipo = (tipo: string) => {
   const traducoes: { [key: string]: string } = {
     fire: 'Fogo',
@@ -141,6 +179,41 @@ const traduzirTipo = (tipo: string) => {
 </script>
 
 <style scoped>
+.favorites {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.favorites-header {
+  display: flex;
+  align-items: center;
+}
+
+.favorites-header h2 {
+  margin: 0;
+  margin-right: 10px;
+}
+
+.clear-favorites {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.favorites-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
 .search-filters {
   display: flex;
   justify-content: center;
@@ -222,12 +295,6 @@ const traduzirTipo = (tipo: string) => {
 .hover-image {
   width: 20px;
   height: 20px;
-  margin-right: 5px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.pagination-button:hover .hover-image {
-  opacity: 1;
+  margin-left: 5px;
 }
 </style>
