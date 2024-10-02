@@ -70,10 +70,19 @@ import Hero from '../../components/Hero.vue';
 import PokemonCard from '../../components/PokemonCard.vue';
 import axios from 'axios';
 
+interface Pokemon {
+  name: string;
+  id: number;
+  image: string;
+  height: number;
+  weight: number;
+  types: string[];
+}
+
 const searchTerm = ref('');
 const selectedType = ref('');
-const pokemonList = ref<any[]>([]);
-const favoritePokemons = ref<any[]>([]);
+const pokemonList = ref<Pokemon[]>([]);
+const favoritePokemons = ref<Pokemon[]>([]);
 
 const types = [
   'fire', 'water', 'grass', 'electric', 'rock', 'ground',
@@ -136,7 +145,7 @@ const previousPage = () => {
   }
 };
 
-const toggleFavorite = (pokemon) => {
+const toggleFavorite = (pokemon: Pokemon) => {
   const index = favoritePokemons.value.findIndex(fav => fav.id === pokemon.id);
   if (index === -1) {
     favoritePokemons.value.push(pokemon);
@@ -145,7 +154,7 @@ const toggleFavorite = (pokemon) => {
   }
 };
 
-const isFavorite = (id) => {
+const isFavorite = (id: number) => {
   return favoritePokemons.value.some(fav => fav.id === id);
 };
 
@@ -287,14 +296,9 @@ const traduzirTipo = (tipo: string) => {
   background-color: #f0f0f0;
 }
 
-.pagination-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .hover-image {
+  margin-left: 5px;
   width: 20px;
   height: 20px;
-  margin-left: 5px;
 }
 </style>

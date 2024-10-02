@@ -18,7 +18,8 @@
   </div>
 </template>
 
-<script lang="ts">
+
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
@@ -29,79 +30,72 @@ interface PokemonSummary {
   types: string[];
 }
 
-export default {
-  setup() {
-    const searchTerm = ref('');
-    const selectedType = ref('');
-    const pokemonList = ref<PokemonSummary[]>([]);
-    const types = [
-      'fire', 'water', 'grass', 'electric', 'rock', 'ground', 'flying',
-      'bug', 'poison', 'normal', 'ghost', 'fighting', 'ice', 'psychic',
-      'dragon', 'dark', 'fairy', 'steel'
-    ];
+const searchTerm = ref('');
+const selectedType = ref('');
+const pokemonList = ref<PokemonSummary[]>([]);
+const types = [
+  'fire', 'water', 'grass', 'electric', 'rock', 'ground', 'flying',
+  'bug', 'poison', 'normal', 'ghost', 'fighting', 'ice', 'psychic',
+  'dragon', 'dark', 'fairy', 'steel'
+];
 
-    const fetchPokemonList = async () => {
-      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
-      const pokemonData = await Promise.all(
-        response.data.results.map(async (pokemon: any) => {
-          const pokemonDetails = await axios.get(pokemon.url);
-          return {
-            name: pokemonDetails.data.name,
-            id: pokemonDetails.data.id,
-            image: pokemonDetails.data.sprites.front_default,
-            types: pokemonDetails.data.types.map((t: any) => t.type.name),
-          };
-        })
-      );
-      pokemonList.value = pokemonData;
-    };
+const fetchPokemonList = async () => {
+  try {
+    const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+    const pokemonData = await Promise.all(
+      response.data.results.map(async (pokemon: any) => {
+        const pokemonDetails = await axios.get(pokemon.url);
+        return {
+          name: pokemonDetails.data.name,
+          id: pokemonDetails.data.id,
+          image: pokemonDetails.data.sprites.front_default,
+          types: pokemonDetails.data.types.map((t: any) => t.type.name),
+        };
+      })
+    );
+    pokemonList.value = pokemonData;
+  } catch (error) {
+    console.error("Erro ao buscar a lista de Pokémon:", error);
+  }
+};
 
-    onMounted(() => {
-      fetchPokemonList();
-    });
+onMounted(() => {
+  fetchPokemonList();
+});
 
-    const filteredPokemonList = computed(() => {
-      return pokemonList.value.filter(pokemon => {
-        const matchesSearchTerm = pokemon.name.includes(searchTerm.value.toLowerCase()) || String(pokemon.id).includes(searchTerm.value);
-        const matchesType = !selectedType.value || pokemon.types.includes(selectedType.value);
-        return matchesSearchTerm && matchesType;
-      });
-    });
+const filteredPokemonList = computed(() => {
+  return pokemonList.value.filter(pokemon => {
+    const matchesSearchTerm = pokemon.name.includes(searchTerm.value.toLowerCase()) || String(pokemon.id).includes(searchTerm.value);
+    const matchesType = !selectedType.value || pokemon.types.includes(selectedType.value);
+    return matchesSearchTerm && matchesType;
+  });
+});
 
-    const traduzirTipo = (tipo: string) => {
-      const traducoes: { [key: string]: string } = {
-        fire: 'Fogo',
-        water: 'Água',
-        grass: 'Planta',
-        electric: 'Elétrico',
-        rock: 'Pedra',
-        ground: 'Terrestre',
-        flying: 'Voador',
-        bug: 'Inseto',
-        poison: 'Venenoso',
-        normal: 'Normal',
-        ghost: 'Fantasma',
-        fighting: 'Lutador',
-        ice: 'Gelo',
-        psychic: 'Psíquico',
-        dragon: 'Dragão',
-        dark: 'Sombrio',
-        fairy: 'Fada',
-        steel: 'Aço',
-      };
-      return traducoes[tipo] || tipo;
-    };
-
-    return {
-      searchTerm,
-      selectedType,
-      filteredPokemonList,
-      types,
-      traduzirTipo,
-    };
-  },
+const traduzirTipo = (tipo: string) => {
+  const traducoes: { [key: string]: string } = {
+    fire: 'Fogo',
+    water: 'Água',
+    grass: 'Planta',
+    electric: 'Elétrico',
+    rock: 'Pedra',
+    ground: 'Terrestre',
+    flying: 'Voador',
+    bug: 'Inseto',
+    poison: 'Venenoso',
+    normal: 'Normal',
+    ghost: 'Fantasma',
+    fighting: 'Lutador',
+    ice: 'Gelo',
+    psychic: 'Psíquico',
+    dragon: 'Dragão',
+    dark: 'Sombrio',
+    fairy: 'Fada',
+    steel: 'Aço',
+  };
+  return traducoes[tipo] || tipo;
 };
 </script>
+
 
 <style scoped>
 .pokemon-list {
