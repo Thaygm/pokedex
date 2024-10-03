@@ -79,6 +79,9 @@ interface Pokemon {
       name: string;
     };
   }>;
+  species: {
+    name: string;
+  };
 }
 
 interface Evolution {
@@ -96,7 +99,7 @@ const fetchPokemonDetails = async () => {
   try {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
     pokemon.value = response.data;
-    await fetchEvolutionChain(pokemon.value.species.url);
+    await fetchEvolutionChain(pokemon.value?.species.url);
   } catch (error) {
     console.error("Erro ao buscar Pokémon:", error);
   }
